@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="statApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Firebase Data Tests</title>
+
+  <link rel="stylesheet" href="vendors/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="theme/css/data-admin.css" />
+
+  <script src="vendors/js/jquery.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+  <script src="vendors/js/angular.min.js"></script>
+  <script src="vendors/js/angularfire.min.js"></script>
+  <script src="vendors/js/bootstrap.min.js"></script>
+
+  <script src="data/config.js"></script>
+
+</head>
+<body ng-controller="StatCtrl">
+<section id="breadcrumbs">
+  <p class="text-white p-2 m-0">Dashboard</p>
+</section>
+
+<section class="container">
+
+<div class="p-3 mb-2 bg-success text-white" id="statSuccess"></div>
+<div class="p-3 mb-2 bg-danger text-white" id="statError"></div>
+
+<div class="py-4">
+  <div class="row">
+    <div class="col-3">
+      <button class="btn btn-secondary mb-4" ng-click="openNewPlayer()">NEW Player</button><br />
+      <button class="btn btn-secondary" ng-click="openNewTeam()">NEW Team</button>
+    </div>
+    <div class="col-9">
+
+      <div class="list-group" id="latestStatsList" role="tablist">
+        <a class="list-group-item list-group-item-action active" data-toggle="list" href="#players" role="tab">Players</a>
+        <a class="list-group-item list-group-item-action" data-toggle="list" href="#teams" role="tab">Teams</a>
+      </div>
+      <div class="tab-content" id="latestStatsContent">
+        <div class="tab-pane active" id="players" role="tabpanel">
+
+            <table class="table">
+              <thead class="thead-light">
+                <tr><th>NAME</th><th>NUMBER</th><th>POS</th><th>TEAM</th><th></th></tr>
+              </thead>
+              <tr ng-repeat="player in data.players">
+                <td>{{player.name}}</td>
+                <td>{{player.number}}</td>
+                <td>{{player.position}}</td>
+                <td>{{player.team | teamRender}}</td>
+                <td width="60px"><button data-id="{{player.id}}" class="btn btn-info btn-sm" ng-click="openEditPlayer(player)">EDIT</button></td>
+              </tr>
+            </table>
+
+        </div>
+        <div class="tab-pane" id="teams" role="tabpanel">
+
+          <table class="table">
+            <thead class="thead-light">
+              <tr><th>TEAM</th><th>LOCATION</th><th></th></tr>
+            </thead>
+            <tr ng-repeat="team in data.teams">
+              <td>{{team.name}}</td><td>{{team.location}}</td><td width="60px"><button data-id="{{team.id}}" class="btn btn-info btn-sm" ng-click="openEditTeam(team)">EDIT</button></td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+
+    </div> <!-- /col9 -->
+  </div> <!-- /row -->
+</div>
+</section>
+
+<!-- Player Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="openEditPlayer">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" ng-bind="activePlayer.name"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="p-3 mb-2 bg-danger text-white" id="playerError"></div>
+        <form>
+          <label>Name:</label><br /><input type="text" ng-model="activePlayer.name" required><br /><br />
+          <label>Position:</label><br />
+          <select ng-model="activePlayer.position">
+            <option value="F">Forward</option><option value="M">Midfield</option><option value="D">Defense</option>
+          </select>
+          <br /><br />
+          <label>Number:</label><br /><input type="number" ng-model="activePlayer.number"><br /><br />
+          <label>Goals:</label><br /><input type="number" ng-model="activePlayer.goals"><br /><br />
+          <label>Team:</label><br />
+          <select ng-model="activePlayer.team">
+            <option ng-selected="{{opt.team === activePlayer.team}}" ng-repeat="opt in data.teams" value="{{opt.id}}" >{{opt.name}}</option>
+          </select>
+          <br />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" ng-click="savePlayer(activePlayer)">Save & Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Team Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="openEditTeam">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" ng-bind="activeTeam.name"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+
+          <label>Name:</label><br /><input type="text" ng-model="activeTeam.name"><br />
+          <label>Location:</label><br /><input type="text" ng-model="activeTeam.location"><br />
+
+          <br />
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" ng-click="saveTeam(activeTeam)">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
